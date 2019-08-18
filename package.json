@@ -1,6 +1,6 @@
 {
   "name": "@zcong/actions-installer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Easily build a setup actions",
   "main": "./dist/index.js",
   "files": [
