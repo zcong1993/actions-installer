@@ -3,45 +3,21 @@ import * as os from 'os'
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 
-export class Installer {
-  protected tempDirectory: string
+export abstract class Installer {
   protected osPlat: string
   protected osArch: string
   name: string
   binPath: string
 
   constructor(name: string, binPath: string = './') {
-    // Load tempDirectory before it gets wiped by tool-cache
-    this.tempDirectory = process.env['RUNNER_TEMPDIRECTORY'] || ''
     this.osPlat = os.platform()
     this.osArch = os.arch()
     this.name = name
     this.binPath = binPath
-
-    this.setupDir()
   }
 
-  setupDir() {
-    if (!this.tempDirectory) {
-      let baseLocation
-      if (process.platform === 'win32') {
-        // On windows use the USERPROFILE env variable
-        baseLocation = process.env['USERPROFILE'] || 'C:\\'
-      } else {
-        if (process.platform === 'darwin') {
-          baseLocation = '/Users'
-        } else {
-          baseLocation = '/home'
-        }
-      }
-      this.tempDirectory = path.join(baseLocation, 'actions', 'temp')
-    }
-  }
-
-  // override it
-  getDownloadUrlByVersion(version: string): string {
-    throw new Error('implement it yourself')
-  }
+  // implement it
+  abstract getDownloadUrlByVersion(version: string): string
 
   async acquire(version: string): Promise<string> {
     const downloadUrl: string = this.getDownloadUrlByVersion(version)
@@ -54,12 +30,7 @@ export class Installer {
       throw new Error(`Failed to download version ${version}: ${error}`)
     }
 
-    let extPath: string = this.tempDirectory
-    if (!extPath) {
-      throw new Error('Temp directory not set')
-    }
-
-    extPath = await tc.extractTar(downloadPath)
+    const extPath = await this.extract(downloadPath)
     //
     // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
     //
@@ -92,5 +63,17 @@ export class Installer {
       return version.concat('.0')
     }
     return version
+  }
+
+  async extract(archivePath: string): Promise<string> {
+    if (archivePath.endsWith('.7z')) {
+      return tc.extract7z(archivePath)
+    }
+
+    if (archivePath.endsWith('.zip')) {
+      return tc.extractZip(archivePath)
+    }
+
+    return tc.extractTar(archivePath)
   }
 }
