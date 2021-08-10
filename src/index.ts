@@ -1,30 +1,7 @@
 import * as path from 'path'
 import * as os from 'os'
-import * as io from '@actions/io';
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
-
-export function getHomeDir(): string {
-  let homedir = '';
-
-  if (process.platform === 'win32') {
-    homedir = process.env['USERPROFILE'] || 'C:\\';
-  } else {
-    homedir = `${process.env.HOME}`;
-  }
-
-  core.debug(`homeDir: ${homedir}`);
-
-  return homedir;
-}
-
-export async function createBinDir(name: string): Promise<string> {
-  const binDir = path.join(getHomeDir(), name);
-  await io.mkdirP(binDir);
-  core.addPath(binDir);
-  core.debug(`binDir: ${binDir}`);
-  return binDir;
-}
 
 export abstract class Installer {
   protected osPlat: string
@@ -32,7 +9,7 @@ export abstract class Installer {
   protected name: string
   protected binPath: string
 
-  constructor(name: string, binPath?: string) {
+  constructor(name: string, binPath: string = '.') {
     this.osPlat = os.platform()
     this.osArch = os.arch()
     this.name = name
@@ -67,11 +44,15 @@ export abstract class Installer {
     toolPath = tc.find(this.name, this.normalizeVersion(version))
 
     if (!toolPath) {
+      core.info('Tool cache not found, acquire new')
       toolPath = await this.acquire(version)
-      core.debug(`Tool is cached under ${toolPath}`)
+    } else {
+      core.info(`Tool is cached under ${toolPath}`)
     }
 
     toolPath = path.join(toolPath, this.binPath)
+
+    core.info(`Add path: ${toolPath}`)
     core.addPath(toolPath)
   }
 
@@ -98,11 +79,5 @@ export abstract class Installer {
     }
 
     return tc.extractTar(archivePath)
-  }
-
-  async ensureBinDir() {
-    if (!this.binPath) {
-      this.binPath = await createBinDir(this.name)
-    }
   }
 }
