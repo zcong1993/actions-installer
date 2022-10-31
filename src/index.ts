@@ -8,12 +8,14 @@ export abstract class Installer {
   protected osArch: string
   protected name: string
   protected binPath: string
+  private authHeader: string
 
-  constructor(name: string, binPath: string = '.') {
+  constructor(name: string, binPath: string = '.', authHeader = '') {
     this.osPlat = os.platform()
     this.osArch = os.arch()
     this.name = name
     this.binPath = binPath
+    this.authHeader = authHeader
   }
 
   // implement it
@@ -24,7 +26,7 @@ export abstract class Installer {
     let downloadPath: string | null = null
 
     try {
-      downloadPath = await tc.downloadTool(downloadUrl)
+      downloadPath = await tc.downloadTool(downloadUrl, undefined, this.authHeader)
     } catch (error) {
       core.debug(error)
       throw new Error(`Failed to download version ${version}: ${error}`)
