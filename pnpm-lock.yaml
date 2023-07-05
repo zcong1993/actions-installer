@@ -13,7 +13,7 @@ specifiers:
   jest: ^29.2.2
   lint-staged: ^13.0.3
   minimist: ^1.2.7
-  prettier: ^2.7.1
+  prettier: ^3.0.0
   prompts: ^2.4.2
   semver: ^7.3.8
   ts-jest: ^29.0.3
@@ -37,7 +37,7 @@ devDependencies:
   jest: 29.2.2_@types+node@18.11.8
   lint-staged: 13.0.3
   minimist: 1.2.7
-  prettier: 2.7.1
+  prettier: 3.0.0
   prompts: 2.4.2
   semver: 7.3.8
   ts-jest: 29.0.3_hqfc2d2bamndr2qwhous4p5igm
@@ -2908,9 +2908,9 @@ packages:
       find-up: 4.1.0
     dev: true
 
-  /prettier/2.7.1:
-    resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
-    engines: {node: '>=10.13.0'}
+  /prettier/3.0.0:
+    resolution: {integrity: sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==}
+    engines: {node: '>=14'}
     hasBin: true
     dev: true
 
